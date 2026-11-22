@@ -1,4 +1,5 @@
 import type { Board, Expedition } from "../../../shared/types";
+import { SEISMIC_MAX_ENERGY } from "../../seismic/lib/geometry";
 export function createExpedition(
   board: Board,
   id: string,
@@ -20,6 +21,8 @@ export function createExpedition(
     nextAction: 1,
     selected: null,
     startedAt: now,
+    surveys: [],
+    seismicEnergy: SEISMIC_MAX_ENERGY,
   };
 }
 export function mayAct(e: Expedition) {

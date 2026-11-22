@@ -5,6 +5,7 @@ import {
   Clock3,
   Heart,
   ShieldCheck,
+  Waves,
 } from "lucide-react";
 import type { Expedition } from "../../../shared/types";
 import type { Command } from "../../../shared/commands";
@@ -36,6 +37,25 @@ export function ActionBar({
         >
           <Flag size={15} />
           标记<span>02</span>
+        </button>
+        <button
+          className={e.mode === "seismic" ? "active" : ""}
+          aria-pressed={e.mode === "seismic"}
+          disabled={!mayAct(e) || e.status === "ready" || e.seismicEnergy <= 0}
+          title={
+            e.seismicEnergy <= 0
+              ? "地震仪电量已耗尽"
+              : "在地图边缘布放震源与接收器，读取剖面总量"
+          }
+          onClick={() =>
+            send({
+              type: "mode",
+              mode: e.mode === "seismic" ? "reveal" : "seismic",
+            })
+          }
+        >
+          <Waves size={15} />
+          地震<span>03</span>
         </button>
       </div>
       <div className="vitals">

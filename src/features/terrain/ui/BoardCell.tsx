@@ -5,6 +5,7 @@ import {
   ShieldCheck,
   Gem,
   Eye,
+  Radio,
 } from "lucide-react";
 import type { Cell } from "../../../shared/types";
 import { coordinate } from "../../../shared/geometry";
@@ -14,6 +15,9 @@ export function BoardCell({
   terminal,
   hint,
   selected,
+  edgePoint,
+  seismicCovered,
+  draftPoint,
   onOpen,
   onMark,
   onChord,
@@ -24,6 +28,9 @@ export function BoardCell({
   terminal: boolean;
   hint: "safe" | "danger" | undefined;
   selected: boolean;
+  edgePoint: boolean;
+  seismicCovered: boolean;
+  draftPoint: number;
   onOpen: () => void;
   onMark: () => void;
   onChord: () => void;
@@ -60,7 +67,9 @@ export function BoardCell({
             ? "探针确认安全，未探索"
             : c.intel === "danger"
               ? "探针确认危险，未探索"
-              : "未探索";
+              : edgePoint
+                ? "可布放地震仪的地图边缘"
+                : "未探索";
   return (
     <button
       role="gridcell"
@@ -78,6 +87,9 @@ export function BoardCell({
         hint ? "hint-" + hint : "",
         selected ? "tile-selected" : "",
         c.revealed && !c.mine ? "number-" + c.adjacent : "",
+        edgePoint ? "edge-point" : "",
+        seismicCovered && !c.revealed ? "seismic-covered" : "",
+        draftPoint >= 0 ? "draft-point" : "",
       ].join(" ")}
       onClick={onOpen}
       onContextMenu={(e) => {
@@ -112,10 +124,15 @@ export function BoardCell({
       {!c.revealed &&
         c.mark === "none" &&
         c.intel === "unknown" &&
+        !edgePoint &&
         c.id % 13 === 0 && <span className="glyph">⌑</span>}
       {c.intel !== "unknown" && !c.revealed && (
         <Eye className="intel-badge" size={7} />
       )}
+      {edgePoint && draftPoint < 0 && (
+        <Radio className="edge-badge" size={8} />
+      )}
+      {draftPoint >= 0 && <span className="draft-badge">{draftPoint + 1}</span>}
     </button>
   );
 }

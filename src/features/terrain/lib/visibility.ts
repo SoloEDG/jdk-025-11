@@ -11,6 +11,7 @@ export function publicBoard(board: Board): PublicBoard {
       adjacent: c.revealed && !c.mine ? c.adjacent : null,
       intel: c.intel,
       exploded: c.revealed && c.mine,
+      atten: c.revealed ? c.atten : null,
     })),
   };
 }

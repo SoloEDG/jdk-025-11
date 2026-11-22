@@ -10,6 +10,7 @@ import {
   chordCells,
 } from "../features/exploration";
 import { inspectCell, activateShield } from "../features/tools";
+import { fireSurvey } from "../features/seismic/model/survey";
 import { settle } from "../features/chronicle";
 export function initialGame(): Workspace {
   return {
@@ -28,6 +29,7 @@ export function initialGame(): Workspace {
 export function gameReducer(state: Workspace, c: Command): Workspace {
   let e = state.doc.expedition;
   let archive = state.doc.archive;
+  let notice = state.notice;
   switch (c.type) {
     case "new": {
       const seed = c.seed.trim().slice(0, 40) || "RUIN-025";
@@ -69,6 +71,16 @@ export function gameReducer(state: Workspace, c: Command): Workspace {
     case "chord":
       e = chordCells(e, c.id);
       break;
+    case "seismic": {
+      // 未发出的测量不产生任何状态变化；失败（含重测、电量不足）只回提示，不扣电量
+      const result = fireSurvey(e, c.cells);
+      if (!result.survey) notice = result.reason;
+      else {
+        e = result.expedition;
+        notice = `测线 ${result.survey.id} 读数已公布：危险 ${result.survey.hazard}、衰减 ${result.survey.attenuation}。`;
+      }
+      break;
+    }
     case "cell": {
       const cell = e.board.cells[c.id];
       if (!mayAct(e) || !cell) break;
@@ -84,13 +96,19 @@ export function gameReducer(state: Workspace, c: Command): Workspace {
           : result.expedition;
         break;
       }
+      if (e.mode === "seismic") break; // 测线布放由专用命令处理，点击不触发探索
       if (!e.board.generated)
         e = { ...e, status: "active", board: generateBoard(e.board, c.id) };
       e = revealCells(e, [c.id]);
       break;
     }
   }
-  if (e === state.doc.expedition) return state;
+  if (e === state.doc.expedition && notice === state.notice) return state;
   if (isTerminal(e.status)) archive = settle(archive, e, Date.now());
-  return { ...state, doc: { ...state.doc, expedition: e, archive } };
+  return {
+    ...state,
+    doc: { ...state.doc, expedition: e, archive },
+    notice,
+  };
 }
+

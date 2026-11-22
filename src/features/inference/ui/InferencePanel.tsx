@@ -3,6 +3,7 @@ import {
   Lightbulb,
   TriangleAlert,
   ArrowUpRight,
+  Waves,
 } from "lucide-react";
 import type { Analysis, Expedition } from "../../../shared/types";
 import { coordinate } from "../../../shared/geometry";
@@ -20,6 +21,7 @@ export function InferencePanel({
   onHints: () => void;
   onLocate: (id: number) => void;
 }) {
+  const top = [...a.safe.slice(0, 2), ...a.danger.slice(0, 1)];
   return (
     <section className="inference-panel">
       <div className="panel-heading">
@@ -27,7 +29,7 @@ export function InferencePanel({
         <h2>推断笔记</h2>
         <span>LOGIC NOTES</span>
       </div>
-      <div className={"logic-status " + (a.conflicts.length ? "conflict" : "")}>
+      <div className={"logic-status " + (a.conflicts.length || a.lineConflicts.length ? "conflict" : "")}>
         <Lightbulb size={16} />
         <p>{inferenceSummary(a, e)}</p>
       </div>
@@ -41,8 +43,8 @@ export function InferencePanel({
           <span>推断危险</span>
         </div>
         <div>
-          <b>{String(a.constraints).padStart(2, "0")}</b>
-          <span>有效线索</span>
+          <b>{String(a.surveyCount).padStart(2, "0")}</b>
+          <span>测线读数</span>
         </div>
       </div>
       <button
@@ -54,12 +56,18 @@ export function InferencePanel({
         {showHints ? "隐藏推断高亮" : "在地图上高亮"}
       </button>
       <div className="deduction-list">
-        {[...a.safe.slice(0, 2), ...a.danger.slice(0, 1)].map((d) => (
+        {top.map((d) => (
           <button key={d.cell} onClick={() => onLocate(d.cell)}>
             <i className={d.kind} />
             <span>
               {coordinate(d.cell, e.board.width)} ·{" "}
               {d.kind === "safe" ? "可探索" : "需警惕"}
+              {d.lines.length > 0 && (
+                <em className="deduction-lines">
+                  <Waves size={9} />
+                  依赖 {d.lines.join("、")}
+                </em>
+              )}
             </span>
             <ArrowUpRight size={12} />
           </button>
@@ -67,7 +75,7 @@ export function InferencePanel({
       </div>
       <p className="logic-caution">
         <TriangleAlert size={11} />
-        推断以你的旗标为条件，不会读取暗格答案。
+        推断以你的旗标与已公布测线为条件，联合求解全部可行结构；欠定时只取共同结论，不读取暗格答案。
       </p>
     </section>
   );

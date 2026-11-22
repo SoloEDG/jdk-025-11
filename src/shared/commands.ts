@@ -7,4 +7,5 @@ export type Command =
   | { type: "pause"; paused?: boolean }
   | { type: "tick" }
   | { type: "extract" }
+  | { type: "seismic"; cells: number[] }
   | { type: "new"; difficulty: Difficulty; seed: string };

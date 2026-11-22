@@ -1,4 +1,4 @@
-import { X, Pickaxe, Flag, ScanSearch } from "lucide-react";
+import { X, Pickaxe, Flag, ScanSearch, Waves } from "lucide-react";
 export function GuideDialog({ onClose }: { onClose: () => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -37,14 +37,21 @@ export function GuideDialog({ onClose }: { onClose: () => void }) {
           </p>
         </div>
         <div className="guide-step">
+          <Waves />
+          <p>
+            <strong>地震勘测（剖面测量）</strong>
+            地震模式下在地图边缘（非角点、不同边）依次放置震源与接收器。每条测线只公布两个总量：沿线危险数与介质衰减，不泄露任何单格答案。测线可重叠交叉，重叠能缩小地下结构的可能范围；未被覆盖的位置始终保持未知。耗电按布置距离计算，草稿未发射不耗电，重测同一条剖面会被拒绝且不重复扣电。
+          </p>
+        </div>
+        <div className="guide-step">
           <ScanSearch />
           <p>
-            <strong>有限道具</strong>
-            探针确认一格但不揭开；火把安全揭开或确认危险；守护符石抵挡一次伤害。信息会进入推断；推断仍以你插的旗标为条件。
+            <strong>联合推断与推荐</strong>
+            已揭数字、旗标、探针结论与全部测线读数会一起求解所有可行地下结构。存在多种结构时系统保留欠定，只报告所有结构的共同结论，并标注每条结论依赖哪些测线；“下一条推荐”按电量、距离与预期排除的不确定性排序，只用公开信息，从不偷看暗格真值。
           </p>
         </div>
         <p className="guide-foot">
-          有三点生命。揭开全部安全格即可完成；也能提前撤离结算。每安全格10分、文物50分、全图奖励200分，触发陷阱扣30分、每道具扣15分，最低0分。自动存档保留整局，后台不计时。
+          有三点生命。揭开全部安全格即可完成；也能提前撤离结算。每安全格10分、文物50分、全图奖励200分，触发陷阱扣30分、每道具扣15分，最低0分；地震勘测只耗仪器电量，不扣积分。自动存档保留整局，后台不计时。
         </p>
         <button className="primary" onClick={onClose}>
           开始我的探险
@@ -53,3 +60,4 @@ export function GuideDialog({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+

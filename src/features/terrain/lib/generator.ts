@@ -2,6 +2,7 @@ import type { Board, Difficulty } from "../../../shared/types";
 import { neighbors } from "../../../shared/geometry";
 import { seedHash, shuffled } from "../../../shared/random";
 import { region } from "../model/regions";
+import { deriveAtten } from "../../seismic/lib/geometry";
 export function blankBoard(difficulty: Difficulty, seed: string): Board {
   const r = region(difficulty);
   return {
@@ -11,16 +12,21 @@ export function blankBoard(difficulty: Difficulty, seed: string): Board {
     seed,
     difficulty,
     generated: false,
-    cells: Array.from({ length: r.width * r.height }, (_, id) => ({
-      id,
-      mine: false,
-      adjacent: 0,
-      revealed: false,
-      mark: "none",
-      intel: "unknown",
-      relic: null,
-      terrain: id % 17 === 0 ? "water" : id % 5 === 0 ? "moss" : "stone",
-    })),
+    cells: Array.from({ length: r.width * r.height }, (_, id) => {
+      const terrain =
+        id % 17 === 0 ? "water" : id % 5 === 0 ? "moss" : "stone";
+      return {
+        id,
+        mine: false,
+        adjacent: 0,
+        revealed: false,
+        mark: "none",
+        intel: "unknown",
+        relic: null,
+        terrain,
+        atten: deriveAtten(seed, id, terrain),
+      };
+    }),
   };
 }
 export function generateBoard(board: Board, first: number): Board {
